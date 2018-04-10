@@ -1,3 +1,13 @@
+.header-nav-right {
+  color: #fff;
+  line-height: 50px;
+  margin-right: 20px;
+  cursor: pointer;
+}
 
+.dropdown-menu li {
+  text-align: center;
+  cursor: pointer;
+}
 
 /*# sourceMappingURL=header.css.map */

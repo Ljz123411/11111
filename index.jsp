@@ -64,14 +64,14 @@
                     username,
                     password,
                 },
-                cache:false
             }).done((data)=>{
-                data=JSON.parse(data);
-                const {code}=data;
+                let result=JSON.parse(data);
+                const {code}=result;
                 if(code=="0000"){
                     $("#error").hide();
-                    location.href="./route/home/home.jsp";
-                }else if(code=="9999"){
+                    localStorage.setItem("id",result.data.id);
+                    location.href="./route/home.jsp";
+                }else if(code=="0001"){
                     $("#error").show();
                 }                
             })

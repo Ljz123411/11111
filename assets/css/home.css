@@ -3,4 +3,19 @@
   display: flex;
 }
 
+#admin {
+  padding-top: 20px;
+}
+#admin .adminList {
+  padding: 10px 0;
+}
+
+.tr {
+  display: none;
+}
+
+.modal-dialog {
+  margin: 210px auto;
+}
+
 /*# sourceMappingURL=home.css.map */

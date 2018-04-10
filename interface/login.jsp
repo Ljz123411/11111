@@ -5,6 +5,13 @@
 <%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="com.google.gson.JsonArray" %>
 <%@ page  trimDirectiveWhitespaces="true" %>
+<%
+    String username = request.getParameter("username") ; 
+    if(username==null){
+        out.println("非法请求");
+        return;
+    }
+%>
 <% 
     try{
          Class.forName("com.mysql.jdbc.Driver");
@@ -32,13 +39,20 @@
                     JsonObject ob = new JsonObject();
                     ob.addProperty("code","0000");
                     JsonObject object=new JsonObject();
-                    object.addProperty("id",rs.getString("studentId"));
+                    if("0".equals( type )){
+                        object.addProperty("id",rs.getString("adminId"));
+                    }else if("1".equals( type )){
+                        object.addProperty("id",rs.getString("teacherId"));
+                    }else{
+                        object.addProperty("id",rs.getString("studentId"));
+                    }
+                    
                     object.addProperty("name",rs.getString("name"));
                     ob.add("data",object);
                     out.println(ob.toString());
                 }else{
                     JsonObject ob = new JsonObject();
-                    ob.addProperty("code","9999");
+                    ob.addProperty("code","0001");
                     out.print(ob.toString());                
                 }
                 rs.close();
@@ -46,7 +60,12 @@
              out.println("数据库连接失败！！！");
          }
      }catch(ClassNotFoundException e){
+        JsonObject result= new JsonObject();
         e.printStackTrace();
+        result.addProperty("code","9999");
+        result.addProperty("msg","接口错误");
+        out.println(result.toString());
+
      } 
  
  

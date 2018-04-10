@@ -2,3 +2,15 @@
     padding-top: 50px;
     display: flex;
 }
+#admin{
+    padding-top: 20px;
+    .adminList{
+        padding: 10px 0;
+    }
+}
+.tr{
+    display: none;
+}
+.modal-dialog{
+    margin: 210px auto;
+}
