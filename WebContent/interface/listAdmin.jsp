@@ -2,10 +2,8 @@
 <%@ page  import="java.sql.*"%>
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
-<%@ page import="com.google.gson.JsonObject" %>
-<%@ page import="com.google.gson.JsonArray" %>
-<%-- <%@ page import="org.json.JSONObject" %> --%>
-<%-- <%@ page import="org.json.JSONArray" %> --%>
+<%@ page import="net.sf.json.JSONObject" %> 
+<%@ page import="net.sf.json.JSONArray" %>
 <%@ page  trimDirectiveWhitespaces="true" %>
 
 <% 
@@ -21,33 +19,33 @@
                 String sql="";
                 sql=" select * from admin ";
                 ResultSet rs = statement.executeQuery(sql);
-                JsonObject obj=new JsonObject();
-                JsonObject ob = new JsonObject();
-                JsonArray JsonArray = new JsonArray();
-                ob.addProperty("code","0000");
+                JSONObject obj=new JSONObject();
+                JSONObject ob = new JSONObject();
+                JSONArray JsonArray = new JSONArray();
+                ob.put("code","0000");
                 int rowCount=rs.getRow();
                 while(rs.next()){
-                    JsonArray = new JsonArray();  
-                    JsonObject object=new JsonObject();
-                    object.addProperty("id",rs.getString("adminId"));
+                	JSONArray array = new JSONArray();  
+                    JSONObject object=new JSONObject();
+                    object.put("id",rs.getString("adminId"));
                     
-                    object.addProperty("name",rs.getString("name"));
-                    object.addProperty("phone",rs.getString("phone"));
-                    JsonArray.add(object);
+                    object.put("name",rs.getString("name"));
+                    object.put("phone",rs.getString("phone"));
+                    array.add(object);
                     
                 }
-                obj.add("list",JsonArray);
-                ob.add("data",obj);
+                obj.put("list",JsonArray);
+                ob.put("data",obj);
                 out.println(ob.toString());
                 rs.close();
          }else{
              out.println("数据库连接失败！！！");
          }
      }catch(ClassNotFoundException e){
-        JsonObject result= new JsonObject();
+    	 JSONObject result= new JSONObject();
         e.printStackTrace();
-        result.addProperty("code","9999");
-        result.addProperty("msg","接口错误");
+        result.put("code","9999");
+        result.put("msg","接口错误");
         out.println(result.toString());
 
      } 

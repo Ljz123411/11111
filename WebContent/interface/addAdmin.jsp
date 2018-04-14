@@ -2,8 +2,6 @@
 <%@ page  import="java.sql.*"%>
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
-<%@ page import="com.google.gson.JsonObject" %>
-<%-- <%@ page import="com.google.gson.JsonArray" %> --%>
 <%@ page import="net.sf.json.JSONObject" %>
 <%@ page  trimDirectiveWhitespaces="true" %>
 
@@ -19,9 +17,9 @@
 
                 String sql="insert into admin(name,phone) values('"+name+"','"+phone+"')";
                 int count=statement.executeUpdate(sql);
-                JsonObject jsonObj = new JsonObject(); 
+                JSONObject jsonObj = new JSONObject(); 
                 if(count>1){
-                    jsonObj.addProperty("code",0000);
+                    jsonObj.put("code",0000);
                     out.println(jsonObj);
                 }
          }else{

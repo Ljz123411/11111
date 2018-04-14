@@ -2,21 +2,21 @@
 <%@ page  import="java.sql.*"%>
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
-<%@ page import="com.google.gson.JsonObject" %>
-<%@ page import="com.google.gson.JsonArray" %>
+<%@ page  import="net.sf.json.JSONArray"%>
+<%@ page  import="net.sf.json.JSONObject"%>
 <%@ page  trimDirectiveWhitespaces="true" %>
-<%
+<%-- <%
     String username = request.getParameter("username") ; 
     if(username==null){
         out.println("非法请求");
         return;
     }
-%>
+%> --%>
 <% 
     try{
          Class.forName("com.mysql.jdbc.Driver");
          String url="jdbc:mysql://localhost:3306/test";
-         Connection conn=DriverManager.getConnection(url,"root","");
+         Connection conn=DriverManager.getConnection(url,"root","your_password");
          if(conn!=null){
                 Statement statement = conn.createStatement();
                 String type = request.getParameter("type") ; 
@@ -36,23 +36,23 @@
                 rs.last();
                 int rowCount=rs.getRow();
                 if(rowCount==1){
-                    JsonObject ob = new JsonObject();
-                    ob.addProperty("code","0000");
-                    JsonObject object=new JsonObject();
+                	JSONObject ob = new JSONObject();
+                    ob.put("code","0000");
+                    JSONObject object=new JSONObject();
                     if("0".equals( type )){
-                        object.addProperty("id",rs.getString("adminId"));
+                        object.put("id",rs.getString("adminId"));
                     }else if("1".equals( type )){
-                        object.addProperty("id",rs.getString("teacherId"));
+                        object.put("id",rs.getString("teacherId"));
                     }else{
-                        object.addProperty("id",rs.getString("studentId"));
+                        object.put("id",rs.getString("studentId"));
                     }
                     
-                    object.addProperty("name",rs.getString("name"));
-                    ob.add("data",object);
+                    object.put("name",rs.getString("name"));
+                    ob.put("data",object);
                     out.println(ob.toString());
                 }else{
-                    JsonObject ob = new JsonObject();
-                    ob.addProperty("code","0001");
+                	JSONObject ob = new JSONObject();
+                    ob.put("code","0001");
                     out.print(ob.toString());                
                 }
                 rs.close();
@@ -60,10 +60,10 @@
              out.println("数据库连接失败！！！");
          }
      }catch(ClassNotFoundException e){
-        JsonObject result= new JsonObject();
+    	 JSONObject result= new JSONObject();
         e.printStackTrace();
-        result.addProperty("code","9999");
-        result.addProperty("msg","接口错误");
+        result.put("code","9999");
+        result.put("msg","接口错误");
         out.println(result.toString());
 
      } 
