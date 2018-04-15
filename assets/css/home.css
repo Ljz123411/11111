@@ -17,5 +17,14 @@
 .modal-dialog {
   margin: 210px auto;
 }
-
+.text-danger,.text-danger2{
+  display: none;
+  color:#f00;
+}
+select{
+    display: block;
+    width: 100%;
+    padding: 5px 0;
+    border-radius: 5px;
+}
 /*# sourceMappingURL=home.css.map */
