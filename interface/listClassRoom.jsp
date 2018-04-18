@@ -2,8 +2,6 @@
 <%@ page  import="java.sql.*"%>
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
-<%@ page import="com.google.gson.JsonObject" %>
-<%@ page import="com.google.gson.JsonArray" %>
 <%@ page import="net.sf.json.JSONObject" %>
 <%@ page import="net.sf.json.JSONArray" %>
 <%@ page import="com.alibaba.fastjson.JSON" %>
@@ -81,10 +79,10 @@
              out.println("数据库连接失败！！！");
          }
      }catch(ClassNotFoundException e){
-        JsonObject result= new JsonObject();
+    	 JSONObject result= new JSONObject();
         e.printStackTrace();
-        result.addProperty("code","9999");
-        result.addProperty("msg","接口错误");
+        result.put("code","9999");
+        result.put("msg","接口错误");
         out.println(result.toString());
 
      } 

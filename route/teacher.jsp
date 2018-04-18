@@ -82,6 +82,8 @@
                             <label for="exampleInputJoinDate">出生年月</label>
                             <input type="date" id="exampleInputBirth"/>	
                         </div>
+                        <p class="text-danger">请填写姓名、身份证号码、学院</p>
+                        <p class="text-danger2">该学生已存在</p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -95,37 +97,53 @@
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="./index.js"></script>
     <script>
-        function getAdminList(){
-            $.ajax({
-                type:'get',
-                url:"../interface/listTeacher.jsp",
-                dataType:'json'
-            }).done(({code,data})=>{
-            	console.log(data);
+    	$(".nav-sidebar").find("li[type='1']").addClass("active").siblings("li").removeClass("active");
+    	function getAdminList(){
+    		$.when(
+   				$.ajax({
+	    			type:'get',
+	    			url:'../interface/listTeacher.jsp',
+	    			dataType:'json'
+	    		}),
+	   			$.ajax({
+	   				type:'get',
+	   				url:'../interface/listCollege.jsp',
+	   				dataType:'json'
+	   			})
+    			
+    		).done((data1,data2)=>{
+    			const {code,data}=data1[0];
+    			const {data:collegedata}=data2[0]
+
                 if (code=="0000") {
                     $(".adminTable").html("");
                     let adminList="";
                     data.list.forEach((item)=>{
-                        // let $clone=$(".tr").clone(true);
-                        // $clone.removeClass("tr").appendTo($(".adminTable"));
-                        // $clone.find("td").eq(0).html(item.name)
-                        // $clone.find("td").eq(1).html(item.phone)
-                        adminList+='<tr><td>'+item.name+'</td><td>'+item.phone+'</td><td>'+""+'</td></tr>'
+                    	let collegeName=collegedata.list.filter(el=>el.collegeId==item.collegeId)
+
+                        adminList+='<tr><td>'+item.name+'</td><td>'+item.phone+'</td><td>'+collegeName[0].name+'</td></tr>'
 
                     })
                     $(".adminTable").html(adminList);  
-                }
+                } 
                 
             })
         }
         getAdminList();
         
         $(".addAdmin").click(function () {
+        	if ($("#exampleInputName").val()==""||$("#exampleInputCollege").val()==""||$("#exampleInputidCard").val()=="") {
+            	console.log("输入完整");
+                $(".text-danger").show();
+                return;
+            }
+        	$(".text-danger").hide();
         	let joindate=$("#exampleInputJoinDate").val();
         	let birthday=$("#exampleInputBirth").val();
             $.ajax({
                 type:'post',
                 url:'../interface/addTeacher.jsp',
+                dataType:'json',
                 data:{
                     name:$("#exampleInputName").val(),
                     phone:$("#exampleInputPhone").val(),
@@ -136,8 +154,14 @@
                     idCardNo:$("#exampleInputidCard").val(),
                 }
             }).done(data=>{
-                $('#myModal').modal('hide');
-                getAdminList();
+            	if(data.code=='0000'){
+                	$('#myModal').modal('hide');
+                    getAdminList();
+                }else if(data.code=="0001"){
+                		$(".text-danger2").show();
+                }else if(data.code=="0002"){
+                	$(".text-danger").show();
+                }
             })
         })
     </script>

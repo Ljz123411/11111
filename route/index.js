@@ -13,7 +13,15 @@ $(".nav-sidebar").on("click",function (e) {
         location.href="./teacher.jsp";
     }
 })
+	let role=localStorage.getItem('role');
 
+	if(role==0){
+		$(".adminAside").show();
+	}else if(role==2){
+		$(".studentAside").show();
+	}else if(role==1){
+		$(".teacherAside").show();
+	}
 // $(".nav-sidebar").get(0).addEventListener("change", function(e) { 
 //     console.log(e,process(e.type));
     

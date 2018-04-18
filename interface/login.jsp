@@ -42,10 +42,14 @@
                     JSONObject object=new JSONObject();
                     if("0".equals( type )){
                         object.put("id",rs.getString("adminId"));
+                        object.put("role",0);
                     }else if("1".equals( type )){
                         object.put("id",rs.getString("teacherId"));
+                        object.put("role",1);
                     }else{
                         object.put("id",rs.getString("studentId"));
+                        object.put("classId",rs.getString("classId"));
+                        object.put("role",2);
                     }
                     
                     object.put("name",rs.getString("name"));

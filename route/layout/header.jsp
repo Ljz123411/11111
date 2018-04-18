@@ -32,6 +32,8 @@
 <script>
     function logout() {
         localStorage.removeItem("id");
+        localStorage.removeItem("classId");
+        localStorage.removeItem("role");
         location.href="../index.jsp";
     }
 </script>

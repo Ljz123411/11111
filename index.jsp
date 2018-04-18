@@ -64,12 +64,17 @@
                     username,
                     password,
                 },
-            }).done((data)=>{
-                let result=JSON.parse(data);
-                const {code}=result;
+                dataType:'json',
+            }).done(({code,data})=>{
                 if(code=="0000"){
                     $("#error").hide();
-                    localStorage.setItem("id",result.data.id);
+                    localStorage.setItem("id",data.id);
+                    localStorage.setItem("role",data.role);
+                    if(type==2){
+                    	localStorage.setItem("classId",data.role);
+                    }
+                    
+                    
                     location.href="./route/home.jsp";
                 }else if(code=="0001"){
                     $("#error").show();

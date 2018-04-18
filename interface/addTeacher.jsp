@@ -9,36 +9,46 @@
 <% 
     try{
          Class.forName("com.mysql.jdbc.Driver");
-         String url="jdbc:mysql://localhost:3306/test";
+         String url="jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8";
          Connection conn=DriverManager.getConnection(url,"root","");
          if(conn!=null){
-                Statement statement = conn.createStatement();
-                Statement statement2 = conn.createStatement();
-                String name = request.getParameter("name") ; 
-                String phone = request.getParameter("phone") ; 
-                String sex = request.getParameter("sex") ;
-                String collegeId=request.getParameter("collegeId");
-                //int collegeId = Integer.parseInt(college) ; 
-                String idCardNo = request.getParameter("idCardNo") ; 
-                ResultSet rs=statement.executeQuery("select  * from teacher where idCardNo='"+idCardNo+"' and name='"+name+"'");
-                rs.last(); 
-                int rowCount=rs.getRow();
-                JSONObject jsonObj = new JSONObject(); 
-                if(rowCount>0){
-                	jsonObj.put("code","0001");
-                	out.println(jsonObj);
-                	return;
-                }
-                String sql="insert into teacher(name,phone,sex,collegeId,idCardNo) values('"+name+"','"+phone+"','"+sex+"','"+collegeId+"','"+idCardNo+"')";
-                //String sql="insert into teacher(name,phone,sex) values('"+name+"','"+phone+"','"+sex+"')";
-                int count=statement.executeUpdate(sql);
-                
-                if(count==1){
-                    jsonObj.put("code","0000");
+        	 Statement statement = conn.createStatement();
+             Statement statement2 = conn.createStatement();
+             String name = request.getParameter("name") ; 
+             String phone = request.getParameter("phone") ; 
+             String sex = request.getParameter("sex") ;
+             String collegeId=request.getParameter("collegeId");
+             //int collegeId = Integer.parseInt(college) ; 
+             String idCardNo = request.getParameter("idCardNo") ; 
+             JSONObject jsonObj = new JSONObject(); 
+                try{
+                	
+                    ResultSet rs=statement.executeQuery("select  * from teacher where idCardNo='"+idCardNo+"' and name='"+name+"'");
+                    rs.last(); 
+                    int rowCount=rs.getRow();
+                    if(rowCount>0){
+                    	jsonObj.put("code","0001");
+                    	jsonObj.put("msg","用户已存在");
+                    	out.println(jsonObj);
+                    	return;
+                    }
+                    String sql="insert into teacher(name,phone,sex,collegeId,idCardNo) values('"+name+"','"+phone+"','"+sex+"','"+collegeId+"','"+idCardNo+"')";
+                    out.println(sql);
+                    int count=statement.executeUpdate(sql);
                     
-                }else{
-                	jsonObj.put("code","0002");
+                    if(count==1){
+                        jsonObj.put("code","0000");
+                        
+                    }else{
+                    	jsonObj.put("code","0002");
+                    }
+                }catch(SQLException e){
+                	out.println(e);
+                	jsonObj.put("code","0003");
+                	jsonObj.put("msg","插入失败");
+                	
                 }
+
                 out.println(jsonObj);
          }else{
              out.println("数据库连接失败！！！");

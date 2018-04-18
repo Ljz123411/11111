@@ -17,23 +17,10 @@
          if(conn!=null){
                 Statement statement = conn.createStatement();
                 String collegeId = request.getParameter("collegeId") ; 
-                String classId = request.getParameter("classId") ; 
-                String name = request.getParameter("name") ; 
                 
                 String sql="";
-                sql=" select * from class where 1 = 1";
-               /*  if(collegeId != "" ||collegeId != null|| !collegeId.equals("null") ){
-               		String msg = " and collegeId = '" +collegeId +"'"; 
-               		sql += msg;
-                }
-                if(classId!=""||classId!= "null"){
-                	String msg2=" and classId = '"+classId +"'";
-                	sql += msg2;
-                }
-                if(name!=""||name!= "null"){
-                	String msg2=" and name = '"+name +"'";
-                	sql += msg2;
-                } */
+                sql=" select * from college";
+
                 ResultSet rs = statement.executeQuery(sql);
                 ResultSetMetaData md = rs.getMetaData();
                 int columnCount = md.getColumnCount();
@@ -58,6 +45,7 @@
                 ob.put("data",obj);
                 out.println(ob.toString()); 
 
+              
                 rs.close();
          }else{
              out.println("数据库连接失败！！！");

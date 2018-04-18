@@ -12,7 +12,16 @@
     <%@  include file="./layout/header.jsp"%>
 
     <div id="home" class="container">
-         <%@  include file="./layout/aside.jsp"%>
+    	<header class="adminAside">
+    		<%@  include file="./layout/aside.jsp"%>
+    	</header>
+         <header class="teacherAside">
+    		<%@  include file="./layout/asideTeacher.jsp"%>
+    	</header>
+    	<header class="studentAside">
+    		<%@  include file="./layout/asideStudent.jsp"%>
+    	</header>
+
         <%-- <div class="col-sm-3 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
                 <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>

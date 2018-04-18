@@ -24,11 +24,11 @@
         </div> --%>
         <div id="content" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div id="admin">
-                <button class="btn btn-default" type="button" data-toggle="modal" data-target="#myModal">添加学生</button>
+                <button class="btn btn-default" type="button" data-toggle="modal" data-target="#myModal">添加班级</button>
                 <div class="adminList">
                     <table class="table table-hover">
                         <thead>
-                            <tr><th>学院</th><th>班级</th><th>学号</th><th>姓名</th><th>性别</th><th>出生年月</th></tr>
+                            <tr><th>学院</th><th>班级</th><th>入学时间</th></tr>
                         </thead>
                         <tbody class="adminTable">
                             <%-- <tr class="tr">
@@ -45,7 +45,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">添加学生</h4>
+                    <h4 class="modal-title" id="myModalLabel">添加班级</h4>
                 </div>
                 <div class="modal-body">
                     <form method="post">
@@ -58,35 +58,17 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputClass">班级</label>
-                            <select class="custom-select" id="exampleInputClass">
-                                <option class="hidden"></option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exampleInputName">姓名</label>
-                            <input type="text"  class="form-control" id="exampleInputName"/>
+                            <label for="exampleInputClass">班级名称</label>
+                            <input type="text"  class="form-control" id="exampleInputClass"/>
+
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputSex">性别</label>
-                            <label><input type="radio" name="sex" value="1" checked/>男</label>
-                            <label><input type="radio" name="sex" value="2"/>女</label>
+                            <label for="exampleInputName">入学时间</label>
+                            <input type="text"  class="form-control" id="exampleInputGrade"/>
                         </div>
-                        <div class="form-group">
-                            <label for="exampleInputJoinDate">出生年月</label>
-                            <input type="date" id="exampleInputBirth"/>	
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleInputidCard">身份证号码</label>
-                            <input type="text" class="form-control" id="exampleInputidCard" placeholder="身份证号码">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleInputPhone">联系方式</label>
-                            <input type="phone" class="form-control" id="exampleInputPhone" placeholder="Phone">
-                        </div>
-                        <p class="text-danger">请填写姓名、班级、学院</p>
-                        <p class="text-danger2">该学生已存在</p>
+                     
+                        <p class="text-danger">请填写班级、学院</p>
+                        <p class="text-danger2">该班级已存在</p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -100,12 +82,12 @@
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="./index.js"></script>
     <script>
-    $(".nav-sidebar").find("li[type='2']").addClass("active").siblings("li").removeClass("active");
+    $(".nav-sidebar").find("li[type='3']").addClass("active").siblings("li").removeClass("active");
         function getAdminList(){
         	$.when(
         			$.ajax({
                         type:'get',
-                        url:"../interface/listStudent.jsp",
+                        url:"../interface/listClass.jsp",
                         dataType:'json'
                     }),
                     $.ajax({
@@ -113,66 +95,57 @@
         				url:'../interface/listCollege.jsp',
         				dataType:'json'
         			}),
-        			 $.ajax({
-        	            type:'get',
-        	            url:"../interface/listClass.jsp",
-        	            dataType:'json'
-        	        }) 
-        	).done((data1,data2,data3)=>{
-
-        		const {code,data:{list,count}}=data1[0];
+        	).done((data1,data2)=>{
+        		console.log(data1)
+        		const {code,data:{list}}=data1[0];
         		const {data:{list:collegeList}}=data2[0];
-        		const {data:{list:classList}}=data3[0];
-
                 if (code=="0000") {
                     $(".adminTable").html("");
                     let adminList="";
                     list.forEach((item)=>{
-                    	let college=collegeList.filter(el=>el.collegeId==item.collegeId)[0]
-                    	let className=classList.filter(ele=>ele.classId==item.classId)[0];
-                    	let collegeName=college?college.name:"";
-                    	let cName=className?className.name:"";
-                        adminList+='<tr><td>'+collegeName+'</td><td>'+cName+'</td><td>'+item.studentId+'</td><td>'+item.name+'</td><td>'+item.sex+'</td><td>'+item.birthday+'</td></tr>'
-                        //adminList+='<tr><td>'+""+'</td><td>'+""+'</td><td>'+item.studentId+'</td><td>'+item.name+'</td><td>'+item.sex+'</td><td>'+item.birthday+'</td></tr>'
+                        // let $clone=$(".tr").clone(true);
+                        // $clone.removeClass("tr").appendTo($(".adminTable"));
+                        // $clone.find("td").eq(0).html(item.name)
+                        // $clone.find("td").eq(1).html(item.phone)
+                        let college=collegeList.filter(el=>el.collegeId==item.collegeId)[0];
+                        let collegeName=college?college.name:"";
+                        adminList+='<tr><td>'+collegeName+'</td><td>'+item.name+'</td><td>'+item.grade+'</td></tr>'
 
                     })
                     $(".adminTable").html(adminList);  
                 }
-                classList.forEach(x=>{
-                	let $clone=$("#exampleInputClass .hidden").clone(true);
-                    $clone.removeClass("hidden").appendTo("#exampleInputClass");
-                    $clone.html(x.name);
-                    $clone.attr({
-                    	'value':x.classId
-                    })
-                })
-                
                 
             })
         }
-
+/*         $.ajax({
+            type:'get',
+            url:"../interface/listClass.jsp",
+            dataType:'json'
+        }).done(({code,data})=>{
+        	let teacherStr='';
+        	data.list.forEach(el=>{
+        		console.log(el);
+        		teacherStr+='<option value='+el.classId+' data-collegeId='+el.collegeId+'>'+el.name+'</option>'
+        	})
+        	
+        	$("#exampleInputClass").html(teacherStr);
+        }) */
         getAdminList();
         
         $(".addAdmin").click(function () {
-            if ($("#exampleInputName").val()==""||$("#exampleInputClass").val()==""||$("#exampleInputidCard").val()=="") {
-            	console.log("输入完整");
+            if ($("#exampleInputClass").val()==""||$("#exampleInputCollege").val()=="") {
                 $(".text-danger").show();
                 return;
             }
             $(".text-danger").hide();
-            let birthday=$("#exampleInputBirth").val();
             $.ajax({
                 type:'post',
-                url:'../interface/addStudent.jsp',
+                url:'../interface/addClass.jsp',
                 dataType:'json',
                 data:{
-                    name:$("#exampleInputName").val(),
-                    phone:$("#exampleInputPhone").val(),
-                    birthday:new Date(birthday).getTime(),
-                    idCardNo:$("#exampleInputidCard").val(),
-                    sex:$('input[name="sex"]:checked').val(),
+                    name:$("#exampleInputClass").val(),
                     collegeId:$("#exampleInputCollege").val(),
-                    classId:$("#exampleInputClass").val(),
+                    grade:$("#exampleInputGrade").val(),
                 }
             }).done(data=>{
                 if(data.code=='0000'){

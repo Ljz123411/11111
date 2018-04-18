@@ -16,24 +16,16 @@
          Connection conn=DriverManager.getConnection(url,"root","");
          if(conn!=null){
                 Statement statement = conn.createStatement();
-                String collegeId = request.getParameter("collegeId") ; 
                 String classId = request.getParameter("classId") ; 
-                String name = request.getParameter("name") ; 
                 
                 String sql="";
-                sql=" select * from class where 1 = 1";
-               /*  if(collegeId != "" ||collegeId != null|| !collegeId.equals("null") ){
-               		String msg = " and collegeId = '" +collegeId +"'"; 
-               		sql += msg;
+                sql=" select * from classcourse where 1=1 ";
+                if(classId!=""||classId!=null||!"null".equals(classId)){
+                	String msg=" and classId='"+classId+"'";
+                	sql+=msg;
                 }
-                if(classId!=""||classId!= "null"){
-                	String msg2=" and classId = '"+classId +"'";
-                	sql += msg2;
-                }
-                if(name!=""||name!= "null"){
-                	String msg2=" and name = '"+name +"'";
-                	sql += msg2;
-                } */
+                
+
                 ResultSet rs = statement.executeQuery(sql);
                 ResultSetMetaData md = rs.getMetaData();
                 int columnCount = md.getColumnCount();
@@ -46,7 +38,7 @@
                 	JSONObject item=new JSONObject();
                     for(int i=1;i<=columnCount;i++){
                     	String columnName=md.getColumnLabel(i);
-                    	item.put(md.getColumnLabel(i),rs.getString(columnName));//错误
+                    	item.put(md.getColumnLabel(i),rs.getString(columnName));
                     }
                     
                     JsonArray.add(item);
@@ -58,6 +50,7 @@
                 ob.put("data",obj);
                 out.println(ob.toString()); 
 
+              
                 rs.close();
          }else{
              out.println("数据库连接失败！！！");
