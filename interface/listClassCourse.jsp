@@ -20,12 +20,12 @@
                 
                 String sql="";
                 sql=" select * from classcourse where 1=1 ";
-                if(classId!=""||classId!=null||!"null".equals(classId)){
+                
+                if(classId.length()!=0){
                 	String msg=" and classId='"+classId+"'";
                 	sql+=msg;
                 }
-                
-
+                out.println(sql);
                 ResultSet rs = statement.executeQuery(sql);
                 ResultSetMetaData md = rs.getMetaData();
                 int columnCount = md.getColumnCount();

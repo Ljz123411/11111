@@ -17,7 +17,7 @@
 .modal-dialog {
   margin: 210px auto;
 }
-.text-danger,.text-danger2{
+.error,.text-danger,.text-danger2{
   display: none;
   color:#f00;
 }
@@ -31,5 +31,22 @@ select{
 	display:none;
 	
 }
+.userInfo{
+	padding:50px 0 0;
+}
+.userInfo .row{
+	margin-bottom:10px;
+}
+.userInfo .row p{
+	line-height:20px;
+	height:40px;
+}
+.userInfo .row p input{
+	display:none;
+}
+.confirmBox{
+	display:none;
+}
+
 
 /*# sourceMappingURL=home.css.map */

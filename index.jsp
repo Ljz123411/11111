@@ -32,6 +32,8 @@
                 <label for="">密码</label>
                 <input type="text" class="form-control" placeholder="请输入密码" name="password" id="password"> 
             </div>
+            <div class="text-danger">请输入账号、密码</div>
+            <div class="text-danger2">登录失败，接口错误</div>
             <div id="error">登录名或密码错误</div>
             <div class="loginbox">
                 <button  class="btn btn-default btn-login" id="login">登录</button>
@@ -49,6 +51,11 @@
             let type=$("#categoryInp").val();
             const username=$("#username").val();
             const password=$("#password").val();
+            if(username==""||password==""){
+            	$(".text-danger").show();
+            	return;
+            }
+            $(".text-danger").hide();
             if (type=="管理员") {
                 type=0;
             } else if(type=="老师"){
@@ -79,6 +86,8 @@
                 }else if(code=="0001"){
                     $("#error").show();
                 }                
+            }).fail(()=>{
+            	$(".text-danger2").show();
             })
         })
     </script>
