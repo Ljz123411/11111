@@ -21,7 +21,7 @@
 
         <div id="content" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div id="admin">
-               <!-- <button class="btn btn-default" type="button" data-toggle="modal" data-target="#myModal">添加班级</button>  -->
+               
                 <div class="adminList">
                     <table class="table table-hover">
                         <thead>

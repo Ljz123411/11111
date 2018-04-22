@@ -78,10 +78,8 @@
                     localStorage.setItem("id",data.id);
                     localStorage.setItem("role",data.role);
                     if(type==2){
-                    	localStorage.setItem("classId",data.role);
+                    	localStorage.setItem("classId",data.classId);
                     }
-                    
-                    
                     location.href="./route/home.jsp";
                 }else if(code=="0001"){
                     $("#error").show();
