@@ -24,11 +24,11 @@
         </div> --%>
         <div id="content" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div id="admin">
-                <button class="btn btn-default" type="button" data-toggle="modal" data-target="#myModal">添加管理员</button>
+                <button class="btn btn-default" type="button" data-toggle="modal" data-target="#myModal">添加班级</button>
                 <div class="adminList">
                     <table class="table table-hover">
                         <thead>
-                            <tr><th>管理员名称</th><th>联系方式</th></tr>
+                            <tr><th>学院</th><th>班级</th><th>入学时间</th></tr>
                         </thead>
                         <tbody class="adminTable">
                             <%-- <tr class="tr">
@@ -45,25 +45,30 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">添加管理员</h4>
+                    <h4 class="modal-title" id="myModalLabel">添加班级</h4>
                 </div>
                 <div class="modal-body">
                     <form method="post">
-                        <div class="form-group">
-                            <label for="exampleInputName">管理员名称</label>
-                            <select class="custom-select" id="exampleInputName">
-                                
+                    	<div class="form-group">
+                            <label for="exampleInputCollege">所属学院</label>
+                            <select class="custom-select" id="exampleInputCollege">
+                                <option value="1" selected >电子信息与电气工程学院</option>
+                                <option value="2">教育学院</option>
+                                <option value="3">数学统计学院</option>
                             </select>
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="exampleInputPhone">联系方式</label>
-                            <input type="phone" class="form-control" id="exampleInputPhone" placeholder="Phone">
-                        </div> -->
-                        <!-- <div class="form-group">
-                            <label for="exampleInputPhone">权限</label>
-                        </div> -->
-                        <p class="text-danger">请填写管理员名称、权限</p>
-                        <p class="text-danger2">该管理员已存在</p>
+                        <div class="form-group">
+                            <label for="exampleInputClass">班级名称</label>
+                            <input type="text"  class="form-control" id="exampleInputClass"/>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputName">入学时间</label>
+                            <input type="text"  class="form-control" id="exampleInputGrade"/>
+                        </div>
+                     
+                        <p class="text-danger">请填写班级、学院</p>
+                        <p class="text-danger2">该班级已存在</p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -77,21 +82,34 @@
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="./index.js"></script>
     <script>
+    $(".nav-sidebar").find("li[type='3']").addClass("active").siblings("li").removeClass("active");
         function getAdminList(){
-            $.ajax({
-                type:'get',
-                url:"../interface/listAdmin.jsp",
-                dataType:'json'
-            }).done(({code,data})=>{
+        	$.when(
+        			$.ajax({
+                        type:'get',
+                        url:"../interface/listClass.jsp",
+                        dataType:'json'
+                    }),
+                    $.ajax({
+        				type:'get',
+        				url:'../interface/listCollege.jsp',
+        				dataType:'json'
+        			}),
+        	).done((data1,data2)=>{
+        		console.log(data1)
+        		const {code,data:{list}}=data1[0];
+        		const {data:{list:collegeList}}=data2[0];
                 if (code=="0000") {
                     $(".adminTable").html("");
                     let adminList="";
-                    data.list.forEach((item)=>{
+                    list.forEach((item)=>{
                         // let $clone=$(".tr").clone(true);
                         // $clone.removeClass("tr").appendTo($(".adminTable"));
                         // $clone.find("td").eq(0).html(item.name)
                         // $clone.find("td").eq(1).html(item.phone)
-                        adminList+='<tr><td>'+item.name+'</td><td>'+item.phone+'</td></tr>'
+                        let college=collegeList.filter(el=>el.collegeId==item.collegeId)[0];
+                        let collegeName=college?college.name:"";
+                        adminList+='<tr><td>'+collegeName+'</td><td>'+item.name+'</td><td>'+item.grade+'</td></tr>'
 
                     })
                     $(".adminTable").html(adminList);  
@@ -99,35 +117,35 @@
                 
             })
         }
-        $.ajax({
+/*         $.ajax({
             type:'get',
-            url:"../interface/listTeacher.jsp",
+            url:"../interface/listClass.jsp",
             dataType:'json'
         }).done(({code,data})=>{
         	let teacherStr='';
         	data.list.forEach(el=>{
         		console.log(el);
-        		teacherStr+='<option value='+el.phone+' data-id='+el.teacherId+'>'+el.name+'</option>'
+        		teacherStr+='<option value='+el.classId+' data-collegeId='+el.collegeId+'>'+el.name+'</option>'
         	})
         	
-        	$("#exampleInputName").html(teacherStr);
-        })
+        	$("#exampleInputClass").html(teacherStr);
+        }) */
         getAdminList();
         
         $(".addAdmin").click(function () {
-            if ($("#exampleInputName").val()==""||$("#exampleInputPhone").val()=="") {
+            if ($("#exampleInputClass").val()==""||$("#exampleInputCollege").val()=="") {
                 $(".text-danger").show();
                 return;
             }
             $(".text-danger").hide();
             $.ajax({
                 type:'post',
-                url:'../interface/addAdmin.jsp',
+                url:'../interface/addClass.jsp',
                 dataType:'json',
                 data:{
-                    name:$("#exampleInputName option:selected").text(),
-                    phone:$("#exampleInputName").val(),
-                    teacherId:$("#exampleInputName option:selected").attr("data-id"),
+                    name:$("#exampleInputClass").val(),
+                    collegeId:$("#exampleInputCollege").val(),
+                    grade:$("#exampleInputGrade").val(),
                 }
             }).done(data=>{
                 if(data.code=='0000'){

@@ -2,45 +2,50 @@
 <%@ page  import="java.sql.*"%>
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
-<%-- <%@ page import="com.google.gson.JsonObject" %>
-<%@ page import="com.google.gson.JsonArray" %> --%>
 <%@ page import="net.sf.json.JSONObject" %>
 <%@ page import="net.sf.json.JSONArray" %>
+<%@ page import="com.alibaba.fastjson.JSON" %>
+
 <%@ page  trimDirectiveWhitespaces="true" %>
 
 <% 
+
     try{
          Class.forName("com.mysql.jdbc.Driver");
          String url="jdbc:mysql://localhost:3306/test";
          Connection conn=DriverManager.getConnection(url,"root","");
          if(conn!=null){
                 Statement statement = conn.createStatement();
-                String index = request.getParameter("index") ; 
-                String number = request.getParameter("number") ; 
+                String collegeId = request.getParameter("collegeId") ; 
                 
                 String sql="";
-                sql=" select * from admin ";
+                sql=" select * from college";
+
                 ResultSet rs = statement.executeQuery(sql);
+                ResultSetMetaData md = rs.getMetaData();
+                int columnCount = md.getColumnCount();
                 JSONObject obj=new JSONObject();
                 JSONObject ob = new JSONObject();
                 JSONArray JsonArray = new JSONArray();
                 ob.put("code","0000");
-                
-                JSONArray array = new JSONArray();  
+                JsonArray = new JSONArray();  
                 while(rs.next()){
-                	JSONObject object=new JSONObject();
-                    object.put("id",rs.getString("adminId"));
-                    object.put("teacherId",rs.getString("teacherId"));
-                    object.put("name",rs.getString("name"));
-                    object.put("phone",rs.getString("phone"));
-                    array.add(object);
+                	JSONObject item=new JSONObject();
+                    for(int i=1;i<=columnCount;i++){
+                    	String columnName=md.getColumnLabel(i);
+                    	item.put(md.getColumnLabel(i),rs.getString(columnName));//错误
+                    }
+                    
+                    JsonArray.add(item);
                 }
                 rs.last();
                 int rowCount=rs.getRow();
-                obj.put("list",array);
+                obj.put("list",JsonArray);
                 obj.put("count",rowCount);
                 ob.put("data",obj);
-                out.println(ob.toString());
+                out.println(ob.toString()); 
+
+              
                 rs.close();
          }else{
              out.println("数据库连接失败！！！");

@@ -26,7 +26,7 @@
 .login .loginbox .btn-login {
   padding: 5px 50px;
 }
-#error{
+#error,.text-danger,.text-danger2{
   color: red;
   display: none;
 }

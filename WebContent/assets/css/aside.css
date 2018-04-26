@@ -12,7 +12,13 @@
   color: #fff;
   background-color: #428bca;
 }
+.active a:visited,.active:visited,.active:hover,.active a:hover,.active a:active,.a:active{
+	background:#428bca !important;
+}
 
+header{
+	display:none;
+}
 @media (min-width: 768px) {
   .sidebar {
     position: fixed;
