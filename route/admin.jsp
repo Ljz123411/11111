@@ -59,9 +59,9 @@
                             <label for="exampleInputPhone">联系方式</label>
                             <input type="phone" class="form-control" id="exampleInputPhone" placeholder="Phone">
                         </div> -->
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="exampleInputPhone">权限</label>
-                        </div>
+                        </div> -->
                         <p class="text-danger">请填写管理员名称、权限</p>
                         <p class="text-danger2">该管理员已存在</p>
                     </form>

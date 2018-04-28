@@ -13,14 +13,13 @@
          Connection conn=DriverManager.getConnection(url,"root","");
          if(conn!=null){
         	 Statement statement = conn.createStatement();
-             Statement statement2 = conn.createStatement();
-             String sql;
-             PreparedStatement  prest=conn.preparedStatement(sql);
+
              String name = request.getParameter("name") ; 
              String phone = request.getParameter("phone") ; 
              String sex = request.getParameter("sex") ;
              String birthday=request.getParameter("birthday");
              String idCardNo = request.getParameter("idCardNo") ; 
+             String collegeId = request.getParameter("collegeId") ; 
              JSONObject jsonObj = new JSONObject(); 
                 try{
                 	

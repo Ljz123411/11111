@@ -13,7 +13,7 @@
         <li><a href="javascript:void(0);" type="0">管理员</a></li>
         <li type="1"><a href="./teacher.jsp" type="1">老师</a></li>
         <li type="2"><a href="./student.jsp" type="2">学生</a></li>
-        <li><a href="javascript:void(0);" type="6">安排考试</a></li>
+        <li><a href="./exam.jsp" type="6">安排考试</a></li>
     </ul>
     
 </div>

@@ -47,6 +47,12 @@ select{
 .confirmBox{
 	display:none;
 }
-
+#exam{
+	padding-top:50px;
+}
+#error{
+	display:none;
+	color:red;
+}
 
 /*# sourceMappingURL=home.css.map */

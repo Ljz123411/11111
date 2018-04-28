@@ -45,10 +45,8 @@
                 String collegeId = request.getParameter("collegeId") ; 
                 
                 String sql="";
-                sql=" select teacherId,name,collegeId,joindate,phone,sex,birthday from teacher where 1 = 1";
-             //   if(collid != "“ || colo != null){
-               // 	msg = "and collid = " +collid; 
-              //  	sql += msg;
+                sql=" select * from classroom where 1 = 1";
+
                 ResultSet rs = statement.executeQuery(sql);
                 ResultSetMetaData md = rs.getMetaData();
                 int columnCount = md.getColumnCount();
