@@ -51,11 +51,11 @@
                     <form method="post">
                         <div class="form-group">
                             <label for="exampleInputName">老师名称</label>
-                            <input type="email" class="form-control" id="exampleInputName" placeholder="Name">
+                            <input type="text" class="form-control" id="exampleInputName" placeholder="Name">
                         </div>
                         <div class="form-group">
                             <label for="exampleInputidCard">身份证号码</label>
-                            <input type="number" class="form-control" id="exampleInputidCard" placeholder="身份证号码">
+                            <input type="text" class="form-control" id="exampleInputidCard" placeholder="身份证号码">
                         </div>
                         <div class="form-group">
                             <label for="exampleInputPhone">联系方式</label>
@@ -83,7 +83,7 @@
                             <input type="date" id="exampleInputBirth"/>	
                         </div>
                         <p class="text-danger">请填写姓名、身份证号码、学院</p>
-                        <p class="text-danger2">该学生已存在</p>
+                        <p class="text-danger2">该老师已存在</p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -149,19 +149,23 @@
                     phone:$("#exampleInputPhone").val(),
                     collegeId:$("#exampleInputCollege").val(),
                     sex:$('input[name="sex"]:checked').val(),
-                    joindate:new Date(joindate).getTime(),
-                    birthday:new Date(birthday).getTime(),
+                    joindate,
+                    birthday,
                     idCardNo:$("#exampleInputidCard").val(),
                 }
             }).done(data=>{
             	if(data.code=='0000'){
                 	$('#myModal').modal('hide');
                     getAdminList();
+
+                	$("#myModal input").val("");
                 }else if(data.code=="0001"){
                 		$(".text-danger2").show();
                 }else if(data.code=="0002"){
                 	$(".text-danger").show();
-                }
+                }else if(data.code=="0003"){
+            		alert("插入失败，请检查老师信息填写是否符合格式！");
+            	}
             })
         })
     </script>

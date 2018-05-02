@@ -4,6 +4,8 @@
 <%@ page  import="java.util.logging.*"%>
 <%@ page  import="com.mysql.jdbc.Driver"%>
 <%@ page import="net.sf.json.JSONObject" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <%@ page  trimDirectiveWhitespaces="true" %>
 
 <% 
@@ -18,8 +20,10 @@
              String phone = request.getParameter("phone") ; 
              String sex = request.getParameter("sex") ;
              String collegeId=request.getParameter("collegeId");
-             //int collegeId = Integer.parseInt(college) ; 
              String idCardNo = request.getParameter("idCardNo") ; 
+             String joindate = request.getParameter("joindate") ; 
+             String birthday = request.getParameter("birthday") ; 
+             
              JSONObject jsonObj = new JSONObject(); 
                 try{
                 	
@@ -32,8 +36,8 @@
                     	out.println(jsonObj);
                     	return;
                     }
-                    String sql="insert into teacher(name,phone,sex,collegeId,idCardNo) values('"+name+"','"+phone+"','"+sex+"','"+collegeId+"','"+idCardNo+"')";
-                    out.println(sql);
+                    String sql="insert into teacher(name,phone,sex,collegeId,idCardNo,birthday,joindate) values('"+name+"','"+phone+"','"+sex+"','"+collegeId+"','"+idCardNo+"','"+birthday+"','"+joindate+"')";
+                    System.out.println(sql);
                     int count=statement.executeUpdate(sql);
                     
                     if(count==1){
@@ -43,7 +47,7 @@
                     	jsonObj.put("code","0002");
                     }
                 }catch(SQLException e){
-                	out.println(e);
+                	System.out.println(e);
                 	jsonObj.put("code","0003");
                 	jsonObj.put("msg","插入失败");
                 	

@@ -30,7 +30,7 @@
             </div>
             <div  class="form-group">
                 <label for="">密码</label>
-                <input type="text" class="form-control" placeholder="请输入密码" name="password" id="password"> 
+                <input type="password" class="form-control" placeholder="请输入密码" name="password" id="password"> 
             </div>
             <div class="text-danger">请输入账号、密码</div>
             <div class="text-danger2">登录失败，接口错误</div>
