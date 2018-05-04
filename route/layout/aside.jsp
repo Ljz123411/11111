@@ -20,7 +20,6 @@
 <script src="../assets/js/jquery-3.2.1.js"></script>
 <script>
 
-	
      $(".nav-sidebar").click(function (e) {
         let type=e.target.getAttribute("type");
         console.log(type);

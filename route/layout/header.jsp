@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">排考系统</a>
+        <a class="navbar-brand" href="#">考务管理系统</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
         <div class="nav navbar-nav navbar-right">

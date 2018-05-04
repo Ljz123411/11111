@@ -10,7 +10,7 @@ $(".nav-sidebar").on("click",function (e) {
     }else if(type==2){
         location.href="./student.jsp";
     }else if(type==3){
-        location.href="./teacher.jsp";
+        location.href="./class.jsp";
     }
 })
 	let role=localStorage.getItem('role');

@@ -41,7 +41,16 @@
                 <div id="error2">请先选择考试时间区间</div>
                 <div id="error3">选择的考试时间小于最少时间要求，请重新选择。</div>
 				<button type="button" class="btn btn-primary onOk">产生排考结果</button>
-                
+                <table id="result" class="table">
+					<thead>
+						<th>课程名</th><th>班级</th><th>考试时间</th><th>考试教室</th><th>监考老师</th>
+					</thead>
+					<today>
+						<tr class="hidden">
+							<td class="courseName"></td><td class="className"></td><td class="courseTime"></td><td class="courseRoom"></td><td class="courseTeacher"></td>
+						</tr>
+					</today>
+				</table>
             </div>
         </div>
        
@@ -50,10 +59,15 @@
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="../assets/js/bootstrap-datetimepicker.min.js"></script>   
     <script src="./index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
     <script>
-	let startDate,endDate,teacherList,courseList,roomList,InvigilateTime,courseCount,teacherCount,roomCount,InvigilateNum;
+	let startDate,endDate,teacherList,courseList,roomList,InvigilateTime,courseCount,teacherCount,roomCount,InvigilateNum,roomList2,classes;
 	// InvigilateNum:每人的监考次数
+	let coursesCombine=[],exams=[];//合并相同课程后的课程数组
+	let courseCombineCount;//合并相同课程后的课程数量
 	let ONEDAY_MILLIS=24*60*60*1000;
+	let ONEHOUR_MILLIS=1*60*60*1000;
+	let courseDuration_MILLIS=ONEHOUR_MILLIS*1.5
 	let dailyExamTime=['8','10','14','16'];
 	let InvigilatePersonNum=2;
     	$('#datetimepicker').datetimepicker({
@@ -76,7 +90,9 @@
     		
     	});
     	$("#datetimepicker").on('changeDate',function(e){
-    		startDate=new Date(e.date.valueOf()).setHours(0,0,0);
+			startDate=new Date(e.date.valueOf()).setHours(0,0,0);
+			console.log(startDate,new Date(startDate));
+			
     	})
     	$("#datetimepickerEnd").on('changeDate',function(e){
     		endDate=new Date(e.date.valueOf()).setHours(0,0,0)+ONEDAY_MILLIS;
@@ -104,39 +120,49 @@
         			type:'get',
         			url:'../interface/listClassRoom.jsp',
         			dataType:'json'
+				}),
+				$.ajax({
+        			type:'get',
+        			url:'../interface/listClass.jsp',
+        			dataType:'json'
         		})
-    		).done((courses,teachers,rooms)=>{
+				
+    		).done((courses,teachers,rooms,class2)=>{
     			courseList=courses[0].data.list;
     			teacherList=teachers[0].data.list;
-    			roomList=rooms[0].data.list;
+				roomList=rooms[0].data.list;
+				classes=class2[0].data.list;
     			courseCount=courses[0].data.count;
     			teacherCount=teachers[0].data.count;
     			roomCount=rooms[0].data.count;
     			let roomLimit=courseCount/(4*roomCount)//根据教室数量限制的天数
     			let teacherLimit=courseCount/(2*teacherCount)//根据老师数量限制的天数
 				InvigilateTime=Math.ceil(teacherLimit>roomLimit?teacherLimit:roomLimit)
-				InvigilateNum=Math.ceil(courseCount/(teacherCount*2));
-				let coursess=[]
+				InvigilateNum=Math.ceil(courseCount/(teacherCount/2));
+				roomList2=_.cloneDeep(roomList);
+				
 				let i=0;
 				courseList.map((item)=>{
-					let repeatCourse=coursess.find(x=>x.courseId==item.courseId)
-
-					console.log(repeatCourse,coursess);
+					let repeatCourse=coursesCombine.find(el=>el.find(x=>x.courseId==item.courseId))
 					
-					if(repeatCourse){
-						coursess[repeatCourse.index].classId+=(','+item.classId);
+					if(repeatCourse){//多个班级选择同一门课 有重复课程
+						item.index=repeatCourse[0].index;
+						coursesCombine[repeatCourse[0].index].push(item);
 					}else{
-						item.index=i++
-						coursess.push(item)
+						item.index=i++;
+						coursesCombine.push([item])
 					}
 				})
-    			$(".info").html('总考试门数：'+courseCount+'  老师总数：'+teacherCount+'  教室总数：'+roomCount)
-    			$(".info2").html(`每个教室一天最多有4场考试，上午两场，下午两场。考试最短所需时间为：`+InvigilateTime+`天。`);
+				console.log(coursesCombine);
+				
+				courseCombineCount=coursesCombine.length;
+    			$(".info").html('总考试门数：'+courseCount+'  老师总数：'+teacherCount+'  教室总数：'+roomCount +'  合并相同课程后的考试门数：'+courseCombineCount)
+    			$(".info2").html('每个教室一天最多有4场考试，上午两场，下午两场。考试最短所需时间为：'+InvigilateTime+'天。最多所需时间为：'+courseCombineCount+'天。');
     		})
 
 		})
 		
-		function checkRepeat(exams,roomInfo,examTime){//检测改时间点的教室是否被占用
+		function checkRepeat(exams,roomInfo,examTime){//检测该时间点的教室是否被占用
 			let repeatroom=exams.find(el=>el.examTime==examTime&&el.roomInfo.id==roomInfo.id)
 			if (repeatroom) {//重复
 				roomRepeatNum++;
@@ -153,7 +179,14 @@
 				checkRepeat(exams,roomInfo,examTime)
 			}
 		}
+
+		function addZero(num){
+			return num>10?num:'0'+num;
+		}
+
 		
+
+
 		$(".onOk").click(function(){
 			
 			if (!startDate||!endDate) {
@@ -166,17 +199,19 @@
 			if (day<InvigilateTime) {
 				$("#error3").show();
 				return;
+			}else if(day>courseCombineCount){
+				alert('所选时间总数大于考试最多需要的天数！请重新选择。');
+				return;
 			}
 			$("#error3").hide();
 			if(!teacherList){
 				$(".submit").click();
 			}
 
-			
-			
-			let dailyCount=Math.ceil(courseCount/day);
+			// exams=handleExamResult(day,courseCount,courseCombineCount,courseList,coursesCombine,teacherList,roomList);
+			let dailyCount=Math.ceil(courseCombineCount/day);
 			console.log(courseCount,day,dailyCount);
-			let newCourse=courseList.slice(0);
+			let newCourse=coursesCombine.slice(0);
 
 			teacherList=teacherList.map((item,index)=>{
 				item.count=0;
@@ -184,46 +219,159 @@
 				return item;
 			})
 			let newTeacherList=teacherList.slice(0);
+			
 			let haveinvigilateTeacher={};
 			// console.log(teacherList);
-			let timeCount=0;
-			let exams=new Array(day).fill(1).map((item,i)=>getDailyCourse(i));
-			function getDailyCourse(i){
-				let minDailyCount=courseCount-dailyCount*i;
-				minDailyCount=minDailyCount>dailyCount?dailyCount:minDailyCount;
-				let examsItem=new Array(minDailyCount).fill(1).map(item=>getCourse());
+			var timeCount=0;
+			let exams=new Array(day).fill(1).map((item,i)=>getDailyCourse(i,day));
+			console.log(exams,classes);
+			
+			let days=new Array(day).fill(1).map((item,i)=>startDate+i*ONEDAY_MILLIS);
+			let result={};
+			days.forEach((element,i) => {
+				result[element]=exams[i]//结果以对象形式存在
+			});
+			for(let key in result){
+				result[key].forEach(el=>el.forEach(item=>{
+					let $clone=$("#result tr.hidden").clone();
+					const {courseInfo:{courseName,classId},room,time,teachers}=item
+					$clone.removeClass("hidden").find(".courseName").html(courseName)
+					
+					let className=classes.filter(x=>x.classId==classId)[0]
+					$clone.find(".className").html(className.name);
+					let courseTime=new Date(parseInt(key)+time*ONEHOUR_MILLIS );
+					let courseEndTime=new Date(parseInt(key)+time*ONEHOUR_MILLIS+courseDuration_MILLIS)
+					$clone.find(".courseTime").html(courseTime.getMonth()+1+'月'+courseTime.getDate()+'日  '+courseTime.getHours()+':'+addZero(courseTime.getMinutes())+'——'+courseEndTime.getHours()+':'+addZero(courseEndTime.getMinutes()));
+					$clone.find(".courseRoom").html(room.name);
+					teachers.forEach(x=>{
+						$clone.find(".courseTeacher").html($clone.find(".courseTeacher").html()+'  '+x.name)
+					})
+					$("#result tbody").append($clone);
+				}))
+			}
+			
+			function getDailyCourse(i,day){//每天的课程
+				let lastCourseCount=newCourse.length;
+				
+				let minDailyCount=lastCourseCount>dailyCount?dailyCount:lastCourseCount;
+				console.log(lastCourseCount,day-i);
+				
+				if (lastCourseCount/minDailyCount<=day-i-1) {
+					minDailyCount=1;
+				}
+				
+				// minDailyCount= minDailyCount<0?0:minDailyCount;
+				let checkedRoom={};
+				dailyExamTime.forEach(x=>roomList.forEach(y=>checkedRoom[x]=checkedRoom[x].push(y)))
+				let examsItem=new Array(minDailyCount).fill(1).map(item=>getCourse(checkedRoom));
 				return examsItem;
 			}
-			function getCourse(){
-				let index=Math.floor(Math.random()*newCourse.length);//课程index
-				let info=newCourse.splice(index,1)[0];
-				const time=dailyExamTime[timeCount%4];
-				timeCount++;
-				let teachers=new Array(InvigilatePersonNum).fill(1).map(item=>getTeacher());
-				// let teachers=new Array(InvigilatePersonNum).map(item=>getTeacher());
 
+			function getCourse(checkedRoom){//一节课的课程安排
+				let index=Math.floor(Math.random()*newCourse.length);//课程index
+				let courseInfos=newCourse.splice(index,1)[0];
+				const time=dailyExamTime[timeCount%4];//考试时间
+				timeCount++;
+				// console.log(courseInfos);
 				
-				return {
-					courseInfo:info,
-					time,
-					teachers,
-				}	
+				return courseInfos.map(element => {
+					let teachers=new Array(InvigilatePersonNum).fill(1).map(item=>getTeacher());
+					let roomRepeatNum=0;
+					let room=getRoom(checkedRoom,time,roomRepeatNum);
+					
+					return {
+						courseInfo:element,
+						time,
+						teachers,
+						room,
+					}
+				});
+				
+				//
+				// // let teachers=new Array(InvigilatePersonNum).map(item=>getTeacher());
+		
 			}
+
 			function getTeacher(){
 				if(newTeacherList.length==0){
 					newTeacherList=Object.values(haveinvigilateTeacher)
 				}
 				let teacherIndex=Math.floor(Math.random()*(newTeacherList.length))
 				let teacherInfo=newTeacherList.splice(teacherIndex,1)[0];
-				if(!haveinvigilateTeacher['teacherId']){
+				
+				if(!haveinvigilateTeacher[teacherInfo.teacherId]){
 					haveinvigilateTeacher[teacherInfo.teacherId]=teacherInfo;
 				}
-				// console.log(teacherInfo);
 				
+				if(haveinvigilateTeacher[teacherInfo.teacherId].count>InvigilateNum){//盖老师监考次数超过平均值
+					getTeacher();
+				}
 				haveinvigilateTeacher[teacherInfo.teacherId].count=haveinvigilateTeacher[teacherInfo.teacherId].count+1;
+				// console.log(teacherInfo.count);
+				
 				return teacherInfo;
 			}
 
+			function getRoom(checkedRoom,time,roomRepeatNum){
+				if(roomList2.length==0){
+					roomList2=_.cloneDeep(roomList);
+				}
+				let roomIndex=Math.ceil(Math.random()*(roomList2.length-1));
+				let roomInfo=roomList2.splice(roomIndex,1)[0];
+				
+				if(!checkedRoom[roomInfo.id]){
+					checkedRoom[roomInfo.id]=time;
+				}else{
+					if (checkedRoom[roomInfo.id].includes(time)) {//某个教室的时间段重复
+						roomRepeatNum++;
+						console.log('重复：',roomInfo.id,checkedRoom[roomInfo.id],time,roomRepeatNum);
+						
+						getRoom(checkedRoom,time,roomRepeatNum);
+					}else{
+						checkedRoom[roomInfo.id]+=","+time;
+					}
+				}
+				return roomInfo;
+			}
+
+			function getCourseTeacherRoom(){
+				courseInfos.map(element => {
+					let teachers=new Array(InvigilatePersonNum).fill(1).map(item=>getTeacher());
+					let room=getRoom(checkedRoom,time);
+					
+					return {
+						courseInfo:element,
+						time,
+						teachers,
+						room,
+					}
+				});
+			}
+
+			
+
+
+			
+			
+			function handleExamResult(day,courseCount,courseCombineCount,courseList,coursesCombine,teacherList,roomList){
+				let dailyCount=Math.ceil(courseCombineCount/day);
+				console.log(courseCount,day,dailyCount);
+				let newCourse=coursesCombine.slice(0);
+
+				teacherList=teacherList.map((item,index)=>{
+					item.count=0;
+					item.index=index;
+					return item;
+				})
+				let newTeacherList=teacherList.slice(0);
+				let haveinvigilateTeacher={};
+				// console.log(teacherList);
+				var timeCount=0;
+				let exams=new Array(day).fill(1).map((item,i)=>getDailyCourse(i,newTeacherList,haveinvigilateTeacher,newCourse,dailyExamTime,InvigilatePersonNum,courseCount,dailyCount,timeCount,courseCombineCount));
+				console.log(exams);
+				
+			}
+			
 	
 			// for(let i=0;i<time;i++){
 			// 	time.push(startDate+ONEDAY_MILLIS*i)
@@ -274,7 +422,6 @@
 			// 	exams.push(exam);
 				
 			// }
-			console.log(exams);
 			
 		})
     </script>
