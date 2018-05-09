@@ -13,13 +13,15 @@
         <li><a href="javascript:void(0);" type="0">管理员</a></li>
         <li type="1"><a href="./teacher.jsp" type="1">老师</a></li>
         <li type="2"><a href="./student.jsp" type="2">学生</a></li>
-        <li><a href="./exam.jsp" type="6">安排考试</a></li>
+        <li type="6"><a href="./exam.jsp" >安排考试</a></li>
+        <li type="7"><a href="./listExams.jsp" >查看考试安排</a></li>
     </ul>
     
 </div>
 <script src="../assets/js/jquery-3.2.1.js"></script>
 <script>
 
+	
      $(".nav-sidebar").click(function (e) {
         let type=e.target.getAttribute("type");
         console.log(type);

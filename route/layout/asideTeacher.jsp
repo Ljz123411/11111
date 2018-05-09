@@ -9,7 +9,7 @@
         
         <li type="1"><a href="./userInfo.jsp" type="my">个人信息</a></li>
 
-        <li type="2"><a href="./student.jsp" type="7">考试安排</a></li>
+        <li type="7"><a href="./listExams.jsp" type="7">考试安排</a></li>
     </ul>
     
 </div>

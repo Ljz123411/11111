@@ -16,20 +16,21 @@
          Connection conn=DriverManager.getConnection(url,"root","");
          if(conn!=null){
                 Statement statement = conn.createStatement();
-                String classId = request.getParameter("classId") ; 
-                
+                String classId = request.getParameter("classId") ;
+                String teacherId = request.getParameter("teacherId") ;
                 String sql="";
-                sql=" select * from classcourse where 1=1 ";
-
-               /*  if(classId.length()!=0){
+                sql=" select * from exams where 1=1 ";
+                System.out.println("teacherId:"+teacherId);
+                if(classId.length()!=0){
                     System.out.println("classid:"+classId);
                 	String msg=" and classId='"+classId+"'";
                 	sql+=msg;
-                }else{
-                	System.out.println("没有");
-                } */
-                 
-                System.out.println(sql);
+                }
+               /*  if(teacherId.length()!=0){
+                	String msg=" and teacherIds like '"+teacherId+"%,' or like ',%"+teacherId+"'";
+                	sql+=msg;
+                }  */
+                System.out.print("sql:"+sql);
                 ResultSet rs = statement.executeQuery(sql);
                 ResultSetMetaData md = rs.getMetaData();
                 int columnCount = md.getColumnCount();
@@ -54,7 +55,6 @@
                 ob.put("data",obj);
                 out.println(ob.toString()); 
 
-              
                 rs.close();
          }else{
              out.println("数据库连接失败！！！");

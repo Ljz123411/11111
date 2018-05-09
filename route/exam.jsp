@@ -40,7 +40,9 @@
                 <div id="error">请重新选择时间</div>
                 <div id="error2">请先选择考试时间区间</div>
                 <div id="error3">选择的考试时间小于最少时间要求，请重新选择。</div>
-				<button type="button" class="btn btn-primary onOk">产生排考结果</button>
+				<button type="button" class="btn btn-primary onOk" >产生排考结果</button>
+				<button type="button" class="btn btn-primary confirmModal" data-toggle="modal" data-target="#myModal" >刷新排考结果</button>
+				<button type="button" class="btn btn-primary onSave">保存排考结果</button>
                 <table id="result" class="table">
 					<thead>
 						<th>课程名</th><th>班级</th><th>考试时间</th><th>考试教室</th><th>监考老师</th>
@@ -53,7 +55,22 @@
 				</table>
             </div>
         </div>
-       
+       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">刷新排考结果</h4>
+                </div>
+                <div class="modal-body">
+                   	确定要重新生成排考结果？之前的结果不会保存！
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary onOk">确定</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
     </div>
     <script src="../assets/js/jquery-3.2.1.js"></script>
     <script src="../assets/js/bootstrap.min.js"></script>
@@ -63,7 +80,7 @@
     <script>
 	let startDate,endDate,teacherList,courseList,roomList,InvigilateTime,courseCount,teacherCount,roomCount,InvigilateNum,roomList2,classes;
 	// InvigilateNum:每人的监考次数
-	let coursesCombine=[],exams=[];//合并相同课程后的课程数组
+	var coursesCombine=[],exams=[];//coursesCombine合并相同课程后的课程数组
 	let courseCombineCount;//合并相同课程后的课程数量
 	let ONEDAY_MILLIS=24*60*60*1000;
 	let ONEHOUR_MILLIS=1*60*60*1000;
@@ -188,7 +205,8 @@
 
 
 		$(".onOk").click(function(){
-			
+			$("#result tbody tr").not(".hidden").remove();
+			$('#myModal').modal('hide');
 			if (!startDate||!endDate) {
 				$("#error2").show();
 				return;
@@ -224,8 +242,10 @@
 			// console.log(teacherList);
 			var timeCount=0;
 			let exams=new Array(day).fill(1).map((item,i)=>getDailyCourse(i,day));
+			localStorage.setItem("exams",JSON.stringify(exams));
 			console.log(exams,classes);
-			
+			$(".confirmModal").show();
+			$(".onSave").show();
 			let days=new Array(day).fill(1).map((item,i)=>startDate+i*ONEDAY_MILLIS);
 			let result={};
 			days.forEach((element,i) => {
@@ -262,7 +282,10 @@
 				
 				// minDailyCount= minDailyCount<0?0:minDailyCount;
 				let checkedRoom={};
-				dailyExamTime.forEach(x=>roomList.forEach(y=>checkedRoom[x]=checkedRoom[x].push(y)))
+				dailyExamTime.forEach(x=>{
+					checkedRoom[x]=[]
+					roomList.forEach(y=>checkedRoom[x].push(y))
+				})
 				let examsItem=new Array(minDailyCount).fill(1).map(item=>getCourse(checkedRoom));
 				return examsItem;
 			}
@@ -270,7 +293,10 @@
 			function getCourse(checkedRoom){//一节课的课程安排
 				let index=Math.floor(Math.random()*newCourse.length);//课程index
 				let courseInfos=newCourse.splice(index,1)[0];
-				const time=dailyExamTime[timeCount%4];//考试时间
+				//const time=dailyExamTime[timeCount%4];//考试时间
+				let courseInfo=getTimeRoom(courseInfos,checkedRoom);
+				/* let times=Object.keys(checkedRoom);
+				const time=times[timeCount%times.length];
 				timeCount++;
 				// console.log(courseInfos);
 				
@@ -285,11 +311,30 @@
 						teachers,
 						room,
 					}
-				});
+				}); */
 				
 				//
-				// // let teachers=new Array(InvigilatePersonNum).map(item=>getTeacher());
+				return courseInfo;
 		
+			}
+			function getTimeRoom(courseInfos,checkedRoom){
+				let times=Object.keys(checkedRoom);
+				const time=times[timeCount%times.length];
+				timeCount++;
+				// console.log(courseInfos);
+				
+				return courseInfos.map(element => {
+					let teachers=new Array(InvigilatePersonNum).fill(1).map(item=>getTeacher());
+					let roomRepeatNum=0;
+					let room=getRoom(checkedRoom,time,roomRepeatNum,courseInfos);
+					
+					return {
+						courseInfo:element,
+						time,
+						teachers,
+						room,
+					}
+				});
 			}
 
 			function getTeacher(){
@@ -312,11 +357,11 @@
 				return teacherInfo;
 			}
 
-			function getRoom(checkedRoom,time,roomRepeatNum){
+			function getRoom(checkedRoom,time,roomRepeatNum,courseInfos){
 				if(roomList2.length==0){
 					roomList2=_.cloneDeep(roomList);
 				}
-				let roomIndex=Math.ceil(Math.random()*(roomList2.length-1));
+				/* let roomIndex=Math.ceil(Math.random()*(roomList2.length-1));
 				let roomInfo=roomList2.splice(roomIndex,1)[0];
 				
 				if(!checkedRoom[roomInfo.id]){
@@ -330,12 +375,22 @@
 					}else{
 						checkedRoom[roomInfo.id]+=","+time;
 					}
+				} */
+				if(!checkedRoom[time]){
+					console.log("同一门课剩余教室不足");
+					getTimeRoom(courseInfos);//递归重新生成时间和教室
+				}
+				let roomIndex=Math.ceil(Math.random()*(checkedRoom[time].length-1));
+				let roomInfo=checkedRoom[time].splice(roomIndex,1)[0];
+				//console.log(checkedRoom)
+				if(checkedRoom[time].length==0){
+					delete checkedRoom[time];
 				}
 				return roomInfo;
 			}
 
 			function getCourseTeacherRoom(){
-				courseInfos.map(element => {
+				return courseInfos.map(element => {
 					let teachers=new Array(InvigilatePersonNum).fill(1).map(item=>getTeacher());
 					let room=getRoom(checkedRoom,time);
 					
@@ -348,10 +403,7 @@
 				});
 			}
 
-			
-
-
-			
+					
 			
 			function handleExamResult(day,courseCount,courseCombineCount,courseList,coursesCombine,teacherList,roomList){
 				let dailyCount=Math.ceil(courseCombineCount/day);
@@ -424,6 +476,47 @@
 			// }
 			
 		})
+		
+		// 保存结果
+		$(".onSave").on("click",function(){
+			let day=(endDate-startDate)/ONEDAY_MILLIS;
+			let days=new Array(day).fill(1).map((item,i)=>startDate+i*ONEDAY_MILLIS);
+			let result=[];
+			let exams=JSON.parse(localStorage.getItem("exams"));
+			//console.log(exams);
+			exams.forEach((item,index)=>{
+				let dayTime=days[index];
+				item.forEach(x=>x.forEach(el=>{
+					let courseTime=parseInt(dayTime)+el.time*ONEHOUR_MILLIS ;
+					console.log(days,dayTime,courseTime);
+					let courseEndTime=parseInt(dayTime)+el.time*ONEHOUR_MILLIS+courseDuration_MILLIS;
+					//courseTime=new Date(courseTime);
+					//courseEndTime=new Date(courseEndTime);
+					//el.courseTime=courseTime.getFullYear()+'-'+parseInt(courseTime.getMonth())+1+"-"+courseTime.getDate();
+					//el.courseEndTime=courseEndTime.getFullYear()+'-'+parseInt(courseEndTime.getMonth())+1+"-"+courseEndTime.getDate();
+					el.courseTime=courseTime;
+					el.courseEndTime=courseEndTime;
+					result.push(el);
+				})
+				)
+			})
+			
+			console.log(result,JSON.stringify(result));
+			$.ajax({
+				type:'post',
+                url:'../interface/addExams.jsp',
+                dataType:'json',
+                data:{
+                    result:JSON.stringify(result),
+                }
+			}).done(({code})=>{
+				if(code=='0000'){
+					 alert("结果保存成功！");                                               
+				}
+			})
+			 
+		})	
+		
     </script>
 </body>
 </html>
